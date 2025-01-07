@@ -196,12 +196,12 @@ def check_math(pred,gt):
 def test_hendrycks_math(model, data_path, start=0, end=MAX_INT, batch_size=1, tensor_parallel_size=1):
     hendrycks_math_ins = []
     hendrycks_math_answers = []
-    problem_prompt = (
-        "Below is an instruction that describes a task. "
-        "Write a response that appropriately completes the request.\n\n"
-        "### Instruction:\n{instruction}\n\n### Response: Let's think step by step."
-    )
-    print('prompt =====', problem_prompt)
+    # problem_prompt = (
+    #     "Below is an instruction that describes a task. "
+    #     "Write a response that appropriately completes the request.\n\n"
+    #     "### Instruction:\n{instruction}\n\n### Response: Let's think step by step."
+    # )
+    # print('prompt =====', problem_prompt)
     math_prompt = []
     math_gt = []
     count = 0
@@ -240,26 +240,26 @@ def test_hendrycks_math(model, data_path, start=0, end=MAX_INT, batch_size=1, te
         else:
             prompt = [prompt]
         
-        prompt = [f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n{i}\nPlease reason step by step, and put your final answer within \\boxed{{}}.<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n" for i in prompt]
-        # messages_list = []
-        # for i in prompt:
-        #     messages = [
-        #         {"role": "system", "content": "Please reason step by step, and put your final answer within \\boxed{}."},
-        #         {"role": "user", "content": i}
-        #     ]
-        #     messages_list.append(messages)
-        #     prompt = messages_list
+        #prompt = [f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n{i}\nPlease reason step by step, and put your final answer within \\boxed{{}}.<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n" for i in prompt]
+        messages_list = []
+        for i in prompt:
+            messages = [
+                {"role": "system", "content": "Please reason step by step, and put your final answer within \\boxed{}."},
+                {"role": "user", "content": i}
+            ]
+            messages_list.append(messages)
+            prompt = messages_list
         
-        # tokenizer = llm.get_tokenizer()
-        # format_prompt = []
-        # for i in prompt[:]:
-        #     conversations = tokenizer.apply_chat_template(
-        #         [i],
-        #         tokenize=False,
-        #         add_generation_prompt=True, 
-        #     )
-        #     format_prompt.append(conversations)
-        format_prompt = prompt
+        tokenizer = llm.get_tokenizer()
+        format_prompt = []
+        for i in prompt[:]:
+            conversations = tokenizer.apply_chat_template(
+                [i],
+                tokenize=False,
+                add_generation_prompt=True, 
+            )
+            format_prompt.append(conversations)
+        #format_prompt = prompt
         completions = llm.generate(format_prompt, sampling_params)
         for i,output in enumerate(completions):
             tmp = {"prompt":math_prompt[count]}

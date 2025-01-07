@@ -230,11 +230,11 @@ def test_hendrycks_math(model, data_path, start=0, end=MAX_INT, batch_size=1, te
     sampling_params = SamplingParams(n=16,temperature=1.0, top_p=1, max_tokens=2048, seed=42)
     print('sampling =====', sampling_params)
 
-    llm = LLM(model=model,tensor_parallel_size=tensor_parallel_size, enforce_eager=True, dtype = "float16", gpu_memory_utilization=0.85,swap_space=128)
+    llm = LLM(model=model,tensor_parallel_size=tensor_parallel_size, enforce_eager=True, dtype = "float16", gpu_memory_utilization=0.6,swap_space=128)
             
     res_completions = []
     save_data = []
-    for idx, (prompt) in enumerate(tqdm(batch_math)):
+    for idx, (prompt) in tqdm(enumerate(batch_math)):
         if isinstance(prompt, list):
             pass
         else:
@@ -274,7 +274,7 @@ def test_hendrycks_math(model, data_path, start=0, end=MAX_INT, batch_size=1, te
                     label_list.append(1)
                 else:
                     label_list.append(0)
-            #tmp['label'] = label_list
+            tmp['label'] = label_list
             tmp['gt'] = remove_boxed(util.last_boxed_only_string(math_gt[count]))
             save_data.append(tmp)
             count += 1
@@ -298,13 +298,13 @@ def test_hendrycks_math(model, data_path, start=0, end=MAX_INT, batch_size=1, te
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default='meta-llama/Llama-3.1-8B-Instruct')  # model path
+    parser.add_argument("--model", type=str, default='deepseek-ai/deepseek-math-7b-instruct')  # model path
     parser.add_argument("--data_file", type=str, default='AI-MO/NuminaMath-CoT')  # data path
     parser.add_argument("--start", type=int, default=0) #start index
     parser.add_argument("--end", type=int, default=MAX_INT)  # end index
-    parser.add_argument("--batch_size", type=int, default=5000)  # batch_size
+    parser.add_argument("--batch_size", type=int, default=10000)  # batch_size
     parser.add_argument("--tensor_parallel_size", type=int, default=1)  # tensor_parallel_size
-    parser.add_argument("--output_dir", type=str, default="numina_math/llama31_numina_n16_forth50k_temp1_seed42.json")
+    parser.add_argument("--output_dir", type=str, default="numina_math/deepseek_instruct_n256_temp1_seed42.json")
     return parser.parse_args()
 
 if __name__ == "__main__":
